@@ -1,0 +1,60 @@
+jobs:
+  fight-of-heroes-job:
+    executor:
+      name: docker/docker
+      tag: '3.6'
+    steps:
+      - checkout
+      - docker/install-docker-tools
+      - setup_remote_docker
+      - run:
+          name: Start container and verify it's working
+          command: |
+            set -x
+            docker-compose up -d
+            # copy sql script to database
+            docker cp ./events.sql database:/docker-entrypoint-initdb.d/events.sql
+            # docker-compose will start 2 containers, the one with service will be named `service`
+            # we start another container with curl in the same network as `service`, this way we have
+            # all exposed ports from `service` available on `localhost` in this new container
+            docker run --network heroes-network\
+              appropriate/curl --retry 15 --retry-delay 1 --retry-connrefused http://service:8088/health
+            # create a dummy container which will hold a volume with config
+            docker create -v /contracts -v /spring-cloud-contract-output --name source alpine:3.4 /bin/true
+            # copy a config file into this volume
+            docker cp ./contracts source:/contracts
+      - run:
+          name: Run tests
+          command: |
+            docker run \
+              --network=heroes-network --volumes-from source \
+              -e PUBLISH_ARTIFACTS=false \
+              -e APPLICATION_BASE_URL=http://fight-of-heroes-service:8088/ \
+              -e PROJECT_GROUP=com.javiersvg \
+              -e PROJECT_VERSION=0.0.1-SNAPSHOT \
+              -e PROJECT_NAME=custom-contracts \
+              --name tests springcloud/spring-cloud-contract:2.2.1.RELEASE
+      - run:
+          name: Copy rest results from container
+          command: |
+            docker cp source:/spring-cloud-contract-output .
+          when: always
+      - run:
+          name: Print docker compose logs
+          command: |
+            docker-compose ps
+            docker-compose logs
+          when: always
+      - store_test_results:
+          path: spring-cloud-contract-output/test-results/
+      - store_artifacts:
+          destination: Results
+          path: spring-cloud-contract-output/reports/tests/test/
+
+orbs:
+  docker: circleci/docker@1.0.0
+version: 2.1
+workflows:
+  fight-of-heroes-workflow:
+    jobs:
+      - fight-of-heroes-job

@@ -1,0 +1,12 @@
+request:
+  url: /query
+  method: GET
+response:
+  status: 200
+  body:
+    - Heroes:
+      - Antman
+      - Spider Man
+    - Heroes:
+      - Superman
+      - Wonder Woman
