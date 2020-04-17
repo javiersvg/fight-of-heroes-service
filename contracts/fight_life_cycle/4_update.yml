@@ -1,0 +1,12 @@
+request:
+  url: /command
+  method: POST
+  body:
+    name: UpdateFight
+    data:
+      id: b837e4a9-458e-465e-9eb3-29029961aea8
+      heroes:
+        - Captain America
+        - Ironman
+response:
+  status: 200

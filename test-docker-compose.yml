@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  test:
+    image: springcloud/spring-cloud-contract:2.2.1.RELEASE
+    environment:
+      - PUBLISH_ARTIFACTS=false
+      - APPLICATION_BASE_URL=http://fight-of-heroes-service:8088/
+      - PROJECT_GROUP=com.javiersvg
+      - PROJECT_VERSION=0.0.1-SNAPSHOT
+      - PROJECT_NAME=custom-contracts
+    volumes:
+      - "./contracts/:/contracts:ro"
+      - "./build/spring-cloud-contract-output/:/spring-cloud-contract-output/"
+    networks: 
+      - heroes
+
+networks:
+  heroes:
+    name: heroes

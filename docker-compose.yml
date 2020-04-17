@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  database:
+    image: mysql
+    environment: 
+      - MYSQL_DATABASE=events
+      - MYSQL_ROOT_PASSWORD=password
+    volumes: 
+      - "./events.sql:/docker-entrypoint-initdb.d/events.sql"
+    networks: 
+      - heroes
+  fight-of-heroes-service:
+    build: .
+    ports:
+      - "8088:8088"
+    networks: 
+      - heroes
+networks: 
+  heroes:
+    name: heroes

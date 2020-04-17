@@ -1,0 +1,11 @@
+request:
+  url: /command
+  method: POST
+  body:
+    name: CreateFight
+    data:
+      heroes:
+        - Antman
+        - Spider Man
+response:
+  status: 200

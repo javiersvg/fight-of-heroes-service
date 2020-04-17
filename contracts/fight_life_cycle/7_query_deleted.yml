@@ -1,0 +1,9 @@
+request:
+  url: /query/b837e4a9-458e-465e-9eb3-29029961aea8
+  method: GET
+response:
+  status: 200
+  body:
+    Heroes:
+    - Captain America
+    - Ironman
